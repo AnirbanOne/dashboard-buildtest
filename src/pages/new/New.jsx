@@ -3,10 +3,35 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useState } from "react";
+import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 const New = ({ inputs, title }) => {
   const [file, setFile] = useState("");
+  const [input, setInput] = useState({
+    Username: "",
+    Name_and_surname: "",
+    Email: "",
+    Phone: "",
+    Password: "",
+    Address: "",
+    Country: ""
+  });
 
+  const handleChange = (e) => {
+    setInput((prev) => ({...prev, [e.target.name]: e.target.value}))
+    // console.log(inputs);
+  }
+  
+  const handleClick = async (e) => {
+    try {
+      e.preventDefault();
+      await axios.post("http://localhost:8000/dashboard/user/new", input)
+      Navigate("/user");
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <div className="new">
       <Sidebar />
@@ -43,10 +68,10 @@ const New = ({ inputs, title }) => {
               {inputs.map((input) => (
                 <div className="formInput" key={input.id}>
                   <label>{input.label}</label>
-                  <input type={input.type} placeholder={input.placeholder} />
+                  <input type={input.type} placeholder={input.placeholder} name={input.label} onChange={handleChange}/>
                 </div>
               ))}
-              <button>Send</button>
+              <button onClick={handleClick}>Send</button>
             </form>
           </div>
         </div>

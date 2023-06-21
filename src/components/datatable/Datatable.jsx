@@ -1,38 +1,26 @@
 import "./datatable.scss";
 import { DataGrid } from "@mui/x-data-grid";
-import { userColumns, userRows } from "../../datatablesource";
+import { userColumns, fetchData } from "../../datatablesource";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Datatable = () => {
-  const [data, setData] = useState(userRows);
+  const [data, setData] = useState([]);
 
-  const handleDelete = (id) => {
-    setData(data.filter((item) => item.id !== id));
-  };
+  useEffect(() => {
+    const fetchDataAsync = async () => {
+      try {
+        const userRows = await fetchData();
+        setData(userRows);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-  const actionColumn = [
-    {
-      field: "action",
-      headerName: "Action",
-      width: 200,
-      renderCell: (params) => {
-        return (
-          <div className="cellAction">
-            <Link to="/users/test" style={{ textDecoration: "none" }}>
-              <div className="viewButton">View</div>
-            </Link>
-            <div
-              className="deleteButton"
-              onClick={() => handleDelete(params.row.id)}
-            >
-              Delete
-            </div>
-          </div>
-        );
-      },
-    },
-  ];
+    fetchDataAsync();
+  }, []);
+
+
   return (
     <div className="datatable">
       <div className="datatableTitle">
@@ -44,7 +32,7 @@ const Datatable = () => {
       <DataGrid
         className="datagrid"
         rows={data}
-        columns={userColumns.concat(actionColumn)}
+        columns={userColumns}
         pageSize={9}
         rowsPerPageOptions={[9]}
         checkboxSelection
